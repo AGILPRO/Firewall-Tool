@@ -107,7 +107,8 @@ def handle_packet(packet):
     # Add to suspected IPs list if classified as restricted
     if decision == 1:
         if ip_src not in suspected_ips:
-            suspected_ips[ip_src] = {'classification': decision, 'checked': False}
+            suspected_ips[ip_src] = {'classification': decision, 'checked': False, 'request_count': 0}
+        suspected_ips[ip_src]['request_count'] += 1  # Increment request count
         logging.info(f"Packet from {ip_src} is suspicious and added to the suspected IP list.")
     
     # Identify potential attacks
