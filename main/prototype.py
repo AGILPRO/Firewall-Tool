@@ -13,6 +13,9 @@ suspected_ips = {}
 blocked_ips = set()
 suspend_list = {}
 
+# Port scan threshold
+PORT_SCAN_THRESHOLD = 50
+
 # Function to perform reverse port scanning
 def reverse_port_scan(ip_address, ports=[80, 443, 1194, 1723, 8080]):
     open_ports = []
@@ -56,19 +59,8 @@ def analyze_and_block_suspected_ips():
 
         logging.info(f"Analyzing suspected IP: {ip_address}")
 
-        # Reverse port scan to check if the IP is a VPN IP
-        open_ports = reverse_port_scan(ip_address)
-        if open_ports:
-            logging.info(f"Open ports on {ip_address}: {open_ports}")
-            if is_potential_vpn(open_ports):
-                logging.info(f"The IP {ip_address} might be a VPN.")
-            else:
-                logging.info(f"The IP {ip_address} is likely not a VPN.")
-        else:
-            logging.info(f"No open ports detected on {ip_address}.")
-
-        # Assuming you analyze further and decide to block if restricted or potential VPN
-        if details['classification'] == 1 or is_potential_vpn(open_ports):
+        # Check if the number of scanned ports exceeds the threshold for a port scan
+        if details['port_scan_count'] > PORT_SCAN_THRESHOLD:
             block_ip(ip_address)
             del suspected_ips[ip_address]  # Remove from suspected list after blocking
         else:
@@ -114,23 +106,45 @@ def handle_packet(packet):
         logging.info(f"Packet detected from {ip_src} to {packet[IP].dst}")
         event_type = "port_scan" if packet.haslayer(TCP) else "packet_send"
 
-    if event_type:
+    if event_type == "ping":
+        # Add to suspected IP list if it's a ping
         if ip_src not in suspected_ips:
             suspected_ips[ip_src] = {
-                'classification': 1 if packet.haslayer(TCP) else 0,  # Example classification: TCP as restricted
+                'classification': 0,  # Classification is irrelevant here
                 'checked': False,
                 'request_count': 0,
+                'port_scan_count': 0,  # Initialize port scan count
                 'events': []
             }
         suspected_ips[ip_src]['request_count'] += 1  # Increment request count
-        logging.info(f"Packet from {ip_src} is suspicious and added to the suspected IP list.")
 
         event = {'type': event_type, 'timestamp': time.time()}
         suspected_ips[ip_src]['events'].append(event)
         check_timed_attack(ip_src)  # Check for timed attack
 
+    elif event_type == "port_scan":
+        if ip_src not in suspected_ips:
+            suspected_ips[ip_src] = {
+                'classification': 0,  # Classification is irrelevant here
+                'checked': False,
+                'request_count': 0,
+                'port_scan_count': 0,  # Initialize port scan count
+                'events': []
+            }
+        suspected_ips[ip_src]['port_scan_count'] += 1
+
     # Analyze suspected IPs after processing each packet
     analyze_and_block_suspected_ips()
+
+    # Display the suspected IP list (for debugging or monitoring purposes)
+    display_suspected_ips()
+
+# Function to display suspected IPs with port scan count greater than threshold
+def display_suspected_ips():
+        for ip, details in suspected_ips.items():
+        if details['port_scan_count'] > PORT_SCAN_THRESHOLD:
+            print("Suspected IPs with Port Scan Count Greater Than 50:")
+            print(f"IP: {ip}, Port Scan Count: {details['port_scan_count']}, Details: {details}")
 
 # Sniffing for packets
 def start_sniffing():
