@@ -142,9 +142,9 @@ def handle_packet(packet):
 # Function to display suspected IPs with port scan count greater than threshold
 def display_suspected_ips():
         for ip, details in suspected_ips.items():
-        if details['port_scan_count'] > PORT_SCAN_THRESHOLD:
-            print("Suspected IPs with Port Scan Count Greater Than 50:")
-            print(f"IP: {ip}, Port Scan Count: {details['port_scan_count']}, Details: {details}")
+            if details['port_scan_count'] > PORT_SCAN_THRESHOLD:
+                print("Suspected IPs with Port Scan Count Greater Than 50:")
+                print(f"IP: {ip}, Port Scan Count: {details['port_scan_count']}, Details: {details}")
 
 # Sniffing for packets
 def start_sniffing():
