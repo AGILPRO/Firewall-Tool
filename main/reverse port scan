@@ -1,9 +1,4 @@
 import socket
-import logging
-
-# Set up logging for reverse port scan
-logging.basicConfig(filename='reverse_port_scan.log', level=logging.INFO)
-
 # Function to perform reverse port scanning
 def reverse_port_scan(ip_address, ports=[80, 443, 1194, 1723, 8080]):
     open_ports = []
