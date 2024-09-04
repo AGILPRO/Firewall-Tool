@@ -1,6 +1,6 @@
 import socket
 # Function to perform reverse port scanning
-def reverse_port_scan(ip_address, ports=[80, 443, 1194, 1723, 8080]):
+def reverse_port_scan(ip_address, ports=[80, 443,21 ,22, 1194, 1723, 8080, 500, 1701, 4500]):
     open_ports = []
     for port in ports:
         try:
