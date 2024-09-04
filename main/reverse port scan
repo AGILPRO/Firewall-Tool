@@ -22,7 +22,7 @@ def reverse_port_scan(ip_address, ports=[80, 443, 1194, 1723, 8080]):
 
 # Function to check if an IP might be a VPN
 def is_potential_vpn(open_ports):
-    vpn_ports = [1194, 1723]  # Common VPN ports for OpenVPN and PPTP
+    vpn_ports = [1194, 1723, 500, 1701, 4500]  # Common VPN ports for OpenVPN and PPTP
     return any(port in vpn_ports for port in open_ports)
 
 if __name__ == "__main__":
