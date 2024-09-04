@@ -1,11 +1,7 @@
 import os
 import subprocess
 from scapy.all import *
-import logging
 import time
-
-# Set up logging for attack monitoring
-logging.basicConfig(filename='attack_monitoring.log', level=logging.INFO)
 
 # List to hold suspected IPs, blocked IPs, and suspend list
 suspected_ips = {}
