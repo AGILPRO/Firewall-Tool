@@ -12,7 +12,7 @@ logging.basicConfig(filename='attack_monitoring.log', level=logging.INFO)
 suspected_ips = {}
 blocked_ips = set()
 suspend_list = {}
-alerted_list={}
+alerted_list=[]
 
 # Port scan threshold
 PORT_SCAN_THRESHOLD = 50
@@ -143,8 +143,8 @@ def handle_packet(packet):
 # Function to display suspected IPs with port scan count greater than threshold
 def display_suspected_ips():
         for ip, details in suspected_ips.items():
-            if details['port_scan_count'] > PORT_SCAN_THRESHOLD:
-                
+            if details['port_scan_count'] > PORT_SCAN_THRESHOLD and ip not in alerted_list:
+                alerted_list.append(ip)
                 print("Suspected IPs with Port Scan Count Greater Than 50:")
                 print(f"IP: {ip}, Port Scan Count: {details['port_scan_count']}, Details: {details}")
 
