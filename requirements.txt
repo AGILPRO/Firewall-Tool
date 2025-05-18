@@ -1,0 +1,12 @@
+---
+
+### 📦 `requirements.txt`
+
+```txt
+scapy
+requests
+nmap
+pandas
+numpy
+scikit-learn
+matplotlib
